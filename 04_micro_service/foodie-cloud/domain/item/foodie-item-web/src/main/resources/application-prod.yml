@@ -4,4 +4,5 @@ server:
 spring:
   datasource:                                           # 数据源的相关配置
     url: jdbc:mysql://1.14.140.53:3306/monolithic-dev?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    username: root
     password: jh541224

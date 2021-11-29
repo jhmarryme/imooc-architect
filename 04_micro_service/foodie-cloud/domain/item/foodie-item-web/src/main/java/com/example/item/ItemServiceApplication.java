@@ -15,7 +15,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @SpringBootApplication
 @EnableEurekaClient
 // 扫描 mybatis 通用 mapper 所在的包
-@MapperScan(basePackages = "com.imooc.item.mapper")
+@MapperScan(basePackages = "com.example.item.mapper")
 // 扫描所有包以及相关组件包
 @ComponentScan(basePackages = {"com.example", "org.n3r.idworker"})
 public class ItemServiceApplication {
