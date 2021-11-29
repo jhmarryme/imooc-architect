@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>foodie-item-pojo</artifactId>
+    <artifactId>foodie-item-service</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -19,13 +19,21 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-            <version>1.0.2</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>foodie-item-mapper</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>foodie-item-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- 分布式锁【1】引入 redisson 依赖 -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>3.15.3</version>
         </dependency>
     </dependencies>
+
 </project>

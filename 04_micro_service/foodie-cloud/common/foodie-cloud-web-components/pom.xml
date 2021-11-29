@@ -19,7 +19,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.example</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>foodie-cloud-common</artifactId>
             <version>${project.version}</version>
         </dependency>
