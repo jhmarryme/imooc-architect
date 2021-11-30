@@ -6,6 +6,7 @@ import com.example.order.pojo.OrderItems;
 import com.example.order.pojo.Orders;
 import com.example.order.pojo.bo.center.OrderItemsCommentBO;
 import com.example.order.service.center.MyCommentsService;
+import com.example.order.service.center.MyOrdersService;
 import com.example.pojo.CommonResult;
 import com.example.pojo.PagedGridResult;
 import io.swagger.annotations.Api;
@@ -13,8 +14,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -26,6 +30,15 @@ public class MyCommentsController extends BaseController {
     @Autowired
     private MyCommentsService myCommentsService;
 
+    @Autowired
+    private MyOrdersService myOrdersService;
+
+    @Autowired
+    private LoadBalancerClient client;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
     @ApiOperation(value = "查询订单列表", notes = "查询订单列表", httpMethod = "POST")
     @PostMapping("/pending")
     public CommonResult pending(
@@ -35,7 +48,7 @@ public class MyCommentsController extends BaseController {
             @RequestParam String orderId) {
 
         // 判断用户和订单是否关联
-        CommonResult checkResult = checkUserOrder(userId, orderId);
+        CommonResult checkResult = myOrdersService.checkUserOrder(userId, orderId);
         if (checkResult.getStatus() != HttpStatus.OK.value()) {
             return checkResult;
         }
@@ -63,7 +76,7 @@ public class MyCommentsController extends BaseController {
         System.out.println(commentList);
 
         // 判断用户和订单是否关联
-        CommonResult checkResult = checkUserOrder(userId, orderId);
+        CommonResult checkResult = myOrdersService.checkUserOrder(userId, orderId);
         if (checkResult.getStatus() != HttpStatus.OK.value()) {
             return checkResult;
         }
@@ -96,11 +109,25 @@ public class MyCommentsController extends BaseController {
             pageSize = COMMON_PAGE_SIZE;
         }
 
-        PagedGridResult grid = myCommentsService.queryMyComments(userId,
+
+        // TODO 前方施工，学完Feign再来改造
+        ServiceInstance instance = client.choose("FOODIE-ITEM-SERVICE");
+        String target = String.format("http://%s:%s/item-comments-api/myComments" +
+                        "?userId=%s&page=%s&pageSize=%s",
+                instance.getHost(),
+                instance.getPort(),
+                userId,
                 page,
                 pageSize);
-
+        // 偷个懒，不判断返回status，等下个章节用Feign重写
+        PagedGridResult grid = restTemplate.getForObject(target, PagedGridResult.class);
         return CommonResult.ok(grid);
+
+        // PagedGridResult grid = myCommentsService.queryMyComments(userId,
+        //         page,
+        //         pageSize);
+        //
+        // return CommonResult.ok(grid);
     }
 
 }

@@ -1,8 +1,8 @@
 package com.imooc.user.controller.center;
 
-import com.jhmarryme.pojo.Users;
-import com.jhmarryme.service.center.CenterUserService;
-import com.jhmarryme.utils.CommonResult;
+import com.example.pojo.CommonResult;
+import com.example.user.pojo.Users;
+import com.example.user.service.center.CenterUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

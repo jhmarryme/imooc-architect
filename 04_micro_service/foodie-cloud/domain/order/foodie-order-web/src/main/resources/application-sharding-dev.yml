@@ -1,0 +1,102 @@
+spring:
+  shardingsphere:
+    # 数据源的配置
+    datasource:
+      # 数据源名称，多数据源以逗号分隔, 其中slave-0/1是从库
+      names: ds-0,ds-1,slave-0,slave-1,ds-default
+      ds-default:
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbc-url: jdbc:mysql://1.14.140.53:30011/distribute-foodie-shop-no-sharding?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+        password: jh541224
+        type: com.zaxxer.hikari.HikariDataSource
+        username: root
+        ds-1:
+      ds-0:
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbc-url: jdbc:mysql://1.14.140.53:30011/distuibute-foodie-shop-sharding-1?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+        password: jh541224
+        type: com.zaxxer.hikari.HikariDataSource
+        username: root
+      ds-1:
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbc-url: jdbc:mysql://1.14.140.53:30012/distuibute-foodie-shop-sharding-2?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+        password: jh541224
+        type: com.zaxxer.hikari.HikariDataSource
+        username: root
+      slave-0:
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbc-url: jdbc:mysql://1.14.140.53:30013/distuibute-foodie-shop-sharding-1?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+        password: jh541224
+        type: com.zaxxer.hikari.HikariDataSource
+        username: root
+      slave-1:
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbc-url: jdbc:mysql://1.14.140.53:30014/distuibute-foodie-shop-sharding-2?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+        password: jh541224
+        type: com.zaxxer.hikari.HikariDataSource
+        username: root
+    mode:
+      overwrite: true
+      repository:
+        type: File
+      type: Standalone
+    # 规则配置
+    rules:
+      sharding:
+        tables:
+          # 逻辑表名称
+          orders:
+            # 行表达式标识符可以使用 ${...} 或 $->{...}，但前者与 Spring 本身的属性文件占位符冲突，因此在 Spring 环境中使用行表达式标识符建议使用 $->{...}
+            actual-data-nodes: ds-$->{0..1}.orders
+            database-strategy:
+              standard:
+                sharding-algorithm-name: database-order-class
+                sharding-column: order_id
+          order_items:
+            actual-data-nodes: ds-$->{0..1}.order_items
+            database-strategy:
+              standard:
+                sharding-algorithm-name: database-order-class
+                sharding-column: order_id
+          order_status:
+            actual-data-nodes: ds-$->{0..1}.order_status
+            database-strategy:
+              standard:
+                sharding-algorithm-name: database-order-class
+                sharding-column: order_id
+
+        # 绑定表的配置
+        binding-tables:
+          - orders,order_items,order_status
+        # 分片算法配置
+        sharding-algorithms:
+          # 数据库的分片策略, 根据user_id决定坐落在哪个库
+          database-order-class:
+            props:
+              strategy: standard
+              # 分片算法的行表达式
+              algorithmClassName: com.jhmarryme.sharding.OrderShardingAlgorithm
+            type: CLASS_BASED
+        # 读写分离配置
+      readwrite-splitting:
+        data-sources:
+          # 这里的数据源的名称与actual-data-nodes中的定义的保持一致
+          ds-0:
+            load-balancer-name: round_robin
+            # 读库
+            read-data-source-names: slave-0
+            # 写库
+            write-data-source-name: ds-0
+          ds-1:
+            load-balancer-name: round_robin
+            read-data-source-names: slave-1
+            write-data-source-name: ds-1
+        # 负载均衡的策略
+        load-balancers:
+          round_robin:
+            type: ROUND_ROBIN
+
+      # 属性配置
+    props:
+      # 展示修改以后的sql语句
+      sql-show: true

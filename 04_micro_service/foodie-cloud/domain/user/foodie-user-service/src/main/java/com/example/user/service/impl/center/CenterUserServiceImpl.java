@@ -1,9 +1,9 @@
 package com.example.user.service.impl.center;
 
-import com.jhmarryme.mapper.UsersMapper;
-import com.jhmarryme.pojo.Users;
-import com.jhmarryme.pojo.bo.center.CenterUserBO;
-import com.jhmarryme.service.center.CenterUserService;
+import com.example.user.mapper.UsersMapper;
+import com.example.user.pojo.Users;
+import com.example.user.pojo.bo.center.CenterUserBO;
+import com.example.user.service.center.CenterUserService;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

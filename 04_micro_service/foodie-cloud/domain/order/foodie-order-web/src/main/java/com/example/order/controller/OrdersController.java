@@ -5,6 +5,7 @@ import com.example.controller.BaseController;
 import com.example.enums.OrderStatusEnum;
 import com.example.enums.PayMethod;
 import com.example.order.pojo.OrderStatus;
+import com.example.order.pojo.bo.PlaceOrderBO;
 import com.example.order.pojo.bo.SubmitOrderBO;
 import com.example.order.pojo.vo.MerchantOrdersVO;
 import com.example.order.pojo.vo.OrderVO;
@@ -13,6 +14,7 @@ import com.example.pojo.CommonResult;
 import com.example.pojo.ShopcartBO;
 import com.example.utils.CookieUtils;
 import com.example.utils.JsonUtils;
+import com.example.utils.RedisOperator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -101,9 +103,9 @@ public class OrdersController extends BaseController {
         }
 
         List<ShopcartBO> shopcartList = JsonUtils.jsonToList(shopcartJson, ShopcartBO.class);
-
+        PlaceOrderBO placeOrderBO = new PlaceOrderBO(submitOrderBO, shopcartList);
         // 1. 创建订单
-        OrderVO orderVO = orderService.createOrder(shopcartList, submitOrderBO);
+        OrderVO orderVO = orderService.createOrder(placeOrderBO);
         String orderId = orderVO.getOrderId();
 
         // 2. 创建订单以后，移除购物车中已结算（已提交）的商品

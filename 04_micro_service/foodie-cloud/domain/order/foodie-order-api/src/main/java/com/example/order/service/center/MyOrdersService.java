@@ -1,9 +1,13 @@
 package com.example.order.service.center;
 
+
 import com.example.order.pojo.Orders;
 import com.example.order.pojo.vo.OrderStatusCountsVO;
+import com.example.pojo.CommonResult;
 import com.example.pojo.PagedGridResult;
+import org.springframework.web.bind.annotation.*;
 
+@RequestMapping("myorder-api")
 public interface MyOrdersService {
 
     /**
@@ -15,15 +19,17 @@ public interface MyOrdersService {
      * @param pageSize
      * @return
      */
-    public PagedGridResult queryMyOrders(String userId,
-                                         Integer orderStatus,
-                                         Integer page,
-                                         Integer pageSize);
+    @GetMapping("order/query")
+    public PagedGridResult queryMyOrders(@RequestParam("userId") String userId,
+                                         @RequestParam("orderStatus") Integer orderStatus,
+                                         @RequestParam(value = "page", required = false) Integer page,
+                                         @RequestParam(value = "pageSize", required = false) Integer pageSize);
 
     /**
      * @Description: 订单状态 --> 商家发货
      */
-    public void updateDeliverOrderStatus(String orderId);
+    @PostMapping("order/delivered")
+    public void updateDeliverOrderStatus(@RequestParam("orderId") String orderId);
 
     /**
      * 查询我的订单
@@ -32,14 +38,17 @@ public interface MyOrdersService {
      * @param orderId
      * @return
      */
-    public Orders queryMyOrder(String userId, String orderId);
+    @GetMapping("order/details")
+    public Orders queryMyOrder(@RequestParam("userId") String userId,
+                               @RequestParam("orderId") String orderId);
 
     /**
      * 更新订单状态 —> 确认收货
      *
      * @return
      */
-    public boolean updateReceiveOrderStatus(String orderId);
+    @PostMapping("order/received")
+    public boolean updateReceiveOrderStatus(@RequestParam("orderId") String orderId);
 
     /**
      * 删除订单（逻辑删除）
@@ -47,13 +56,16 @@ public interface MyOrdersService {
      * @param orderId
      * @return
      */
-    public boolean deleteOrder(String userId, String orderId);
+    @DeleteMapping("order")
+    public boolean deleteOrder(@RequestParam("userId") String userId,
+                               @RequestParam("orderId") String orderId);
 
     /**
      * 查询用户订单数
      * @param userId
      */
-    public OrderStatusCountsVO getOrderStatusCounts(String userId);
+    @GetMapping("order/counts")
+    public OrderStatusCountsVO getOrderStatusCounts(@RequestParam("userId") String userId);
 
     /**
      * 获得分页的订单动向
@@ -62,7 +74,13 @@ public interface MyOrdersService {
      * @param pageSize
      * @return
      */
-    public PagedGridResult getOrdersTrend(String userId,
-                                         Integer page,
-                                         Integer pageSize);
+    @GetMapping("order/trend")
+    public PagedGridResult getOrdersTrend(@RequestParam("userId") String userId,
+                                          @RequestParam("page") Integer page,
+                                          @RequestParam("pageSize") Integer pageSize);
+
+    @GetMapping("checkUserOrder")
+    public CommonResult checkUserOrder(@RequestParam("userId") String userId,
+                                       @RequestParam("orderId") String orderId);
+
 }

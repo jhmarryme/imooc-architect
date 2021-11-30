@@ -1,15 +1,14 @@
 package com.imooc.user.controller.center;
 
-import com.jhmarryme.controller.BaseController;
-import com.jhmarryme.pojo.Users;
-import com.jhmarryme.pojo.bo.center.CenterUserBO;
-import com.jhmarryme.pojo.vo.UsersVO;
-import com.jhmarryme.resource.FileUpload;
-import com.jhmarryme.service.center.CenterUserService;
-import com.jhmarryme.utils.CookieUtils;
-import com.jhmarryme.utils.DateUtil;
-import com.jhmarryme.utils.CommonResult;
-import com.jhmarryme.utils.JsonUtils;
+import com.example.controller.BaseController;
+import com.example.pojo.CommonResult;
+import com.example.user.pojo.Users;
+import com.example.user.pojo.bo.center.CenterUserBO;
+import com.example.user.service.center.CenterUserService;
+import com.example.utils.CookieUtils;
+import com.example.utils.DateUtil;
+import com.example.utils.JsonUtils;
+import com.imooc.user.resource.FileUpload;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -128,13 +127,12 @@ public class CenterUserController extends BaseController {
         // 更新用户头像到数据库
         Users userResult = centerUserService.updateUserFace(userId, finalUserFaceUrl);
 
-//        userResult = setNullProperty(userResult);
+       userResult = setNullProperty(userResult);
 
         // 增加令牌token，会整合进redis，分布式会话
-        UsersVO usersVO = conventUsersVO(userResult);
-
+        // UsersVO usersVO = conventUsersVO(userResult);
         CookieUtils.setCookie(request, response, "user",
-                JsonUtils.objectToJson(usersVO), true);
+                JsonUtils.objectToJson(userResult), true);
 
         return CommonResult.ok();
     }
@@ -160,11 +158,11 @@ public class CenterUserController extends BaseController {
 
         Users userResult = centerUserService.updateUserInfo(userId, centerUserBO);
 
-//        userResult = setNullProperty(userResult);
+       userResult = setNullProperty(userResult);
         // 增加令牌token，会整合进redis，分布式会话
-        UsersVO usersVO = conventUsersVO(userResult);
+        // UsersVO usersVO = conventUsersVO(userResult);
         CookieUtils.setCookie(request, response, "user",
-                JsonUtils.objectToJson(usersVO), true);
+                JsonUtils.objectToJson(userResult), true);
 
 
 

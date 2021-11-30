@@ -1,10 +1,10 @@
 package com.imooc.user.controller;
 
-import com.jhmarryme.pojo.UserAddress;
-import com.jhmarryme.pojo.bo.AddressBO;
-import com.jhmarryme.service.AddressService;
-import com.jhmarryme.utils.CommonResult;
-import com.jhmarryme.utils.MobileEmailUtils;
+import com.example.pojo.CommonResult;
+import com.example.user.pojo.UserAddress;
+import com.example.user.pojo.bo.AddressBO;
+import com.example.user.service.AddressService;
+import com.example.utils.MobileEmailUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;

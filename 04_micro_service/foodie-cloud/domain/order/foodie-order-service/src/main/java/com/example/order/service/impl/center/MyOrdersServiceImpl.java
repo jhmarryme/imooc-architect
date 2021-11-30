@@ -10,6 +10,7 @@ import com.example.order.pojo.Orders;
 import com.example.order.pojo.vo.MyOrdersVO;
 import com.example.order.pojo.vo.OrderStatusCountsVO;
 import com.example.order.service.center.MyOrdersService;
+import com.example.pojo.CommonResult;
 import com.example.pojo.PagedGridResult;
 import com.example.service.BaseService;
 import com.github.pagehelper.PageHelper;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.Date;
@@ -168,5 +170,16 @@ public class MyOrdersServiceImpl extends BaseService implements MyOrdersService 
         List<OrderStatus> list = ordersMapperCustom.getMyOrderTrend(map);
 
         return setterPagedGrid(list, page);
+    }
+
+
+    @Override
+    public CommonResult checkUserOrder(@RequestParam("userId") String userId,
+                                       @RequestParam("orderId") String orderId) {
+        Orders order = queryMyOrder(userId, orderId);
+        if (order == null) {
+            return CommonResult.errorMap("订单不存在！！！");
+        }
+        return CommonResult.ok(order);
     }
 }

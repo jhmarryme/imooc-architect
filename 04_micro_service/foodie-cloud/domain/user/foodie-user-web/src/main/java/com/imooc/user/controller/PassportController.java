@@ -1,11 +1,15 @@
 package com.imooc.user.controller;
 
-import com.jhmarryme.pojo.Users;
-import com.jhmarryme.pojo.bo.ShopcartBO;
-import com.jhmarryme.pojo.bo.UserBO;
-import com.jhmarryme.pojo.vo.UsersVO;
-import com.jhmarryme.service.UserService;
-import com.jhmarryme.utils.*;
+import com.example.controller.BaseController;
+import com.example.pojo.CommonResult;
+import com.example.pojo.ShopcartBO;
+import com.example.user.pojo.Users;
+import com.example.user.pojo.bo.UserBO;
+import com.example.user.service.UserService;
+import com.example.utils.CookieUtils;
+import com.example.utils.JsonUtils;
+import com.example.utils.MD5Utils;
+import com.example.utils.RedisOperator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -84,10 +88,10 @@ public class PassportController extends BaseController {
         Users userResult = userService.createUser(userBO);
 
         // 生成用户token，存入redis会话
-//        userResult = setNullProperty(userResult);
-        UsersVO usersVO = conventUsersVO(userResult);
+       userResult = setNullProperty(userResult);
+        // UsersVO usersVO = conventUsersVO(userResult);
         CookieUtils.setCookie(request, response, "user",
-                JsonUtils.objectToJson(usersVO), true);
+                JsonUtils.objectToJson(userResult), true);
 
 
         // 同步购物车数据
@@ -119,12 +123,13 @@ public class PassportController extends BaseController {
             return CommonResult.errorMsg("用户名或密码不正确");
         }
         // 生成用户token，存入redis会话
-//        userResult = setNullProperty(userResult);
-        UsersVO usersVO = conventUsersVO(userResult);
+       userResult = setNullProperty(userResult);
+        // UsersVO usersVO = conventUsersVO(userResult);
 
         CookieUtils.setCookie(request, response, "user",
-                JsonUtils.objectToJson(usersVO), true);
+                JsonUtils.objectToJson(userResult), true);
 
+        // TODO 生成用户token，存入redis会话
         // 同步购物车数据
         synchShopcartData(userResult.getId(), request, response);
 

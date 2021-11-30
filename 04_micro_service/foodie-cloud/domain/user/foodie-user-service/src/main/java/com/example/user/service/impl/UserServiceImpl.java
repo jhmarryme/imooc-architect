@@ -1,12 +1,12 @@
 package com.example.user.service.impl;
 
-import com.jhmarryme.enums.Sex;
-import com.jhmarryme.mapper.UsersMapper;
-import com.jhmarryme.pojo.Users;
-import com.jhmarryme.pojo.bo.UserBO;
-import com.jhmarryme.service.UserService;
-import com.jhmarryme.utils.DateUtil;
-import com.jhmarryme.utils.MD5Utils;
+import com.example.enums.Sex;
+import com.example.user.mapper.UsersMapper;
+import com.example.user.pojo.Users;
+import com.example.user.pojo.bo.UserBO;
+import com.example.user.service.UserService;
+import com.example.utils.DateUtil;
+import com.example.utils.MD5Utils;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,10 +1,10 @@
 package com.example.user.service.impl;
 
-import com.jhmarryme.enums.YesOrNo;
-import com.jhmarryme.mapper.UserAddressMapper;
-import com.jhmarryme.pojo.UserAddress;
-import com.jhmarryme.pojo.bo.AddressBO;
-import com.jhmarryme.service.AddressService;
+import com.example.enums.YesOrNo;
+import com.example.user.mapper.UserAddressMapper;
+import com.example.user.pojo.UserAddress;
+import com.example.user.pojo.bo.AddressBO;
+import com.example.user.service.AddressService;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

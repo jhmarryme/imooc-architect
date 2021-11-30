@@ -2,12 +2,14 @@ package com.example.order.controller.center;
 
 import com.example.controller.BaseController;
 import com.example.order.pojo.vo.OrderStatusCountsVO;
+import com.example.order.service.center.MyOrdersService;
 import com.example.pojo.CommonResult;
 import com.example.pojo.PagedGridResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("myorders")
 public class MyOrdersController extends BaseController {
 
-//    @Autowired
-//    private MyOrdersService myOrdersService;
+   @Autowired
+   private MyOrdersService myOrdersService;
 
     @ApiOperation(value = "获得订单状态数概况", notes = "获得订单状态数概况", httpMethod = "POST")
     @PostMapping("/statusCounts")
@@ -88,7 +90,7 @@ public class MyOrdersController extends BaseController {
             @ApiParam(name = "userId", value = "用户id", required = true)
             @RequestParam String userId) throws Exception {
 
-        CommonResult checkResult = checkUserOrder(userId, orderId);
+        CommonResult checkResult = myOrdersService.checkUserOrder(userId, orderId);
         if (checkResult.getStatus() != HttpStatus.OK.value()) {
             return checkResult;
         }
@@ -109,7 +111,7 @@ public class MyOrdersController extends BaseController {
             @ApiParam(name = "userId", value = "用户id", required = true)
             @RequestParam String userId) throws Exception {
 
-        CommonResult checkResult = checkUserOrder(userId, orderId);
+        CommonResult checkResult = myOrdersService.checkUserOrder(userId, orderId);
         if (checkResult.getStatus() != HttpStatus.OK.value()) {
             return checkResult;
         }

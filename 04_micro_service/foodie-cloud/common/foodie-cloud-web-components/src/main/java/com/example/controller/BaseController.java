@@ -15,12 +15,12 @@ public class BaseController {
     public static final String REDIS_USER_TOKEN = "redis_user_token";
 
     // 支付中心的调用地址
-    String paymentUrl = "http://payment.t.mukewang.com/foodie-payment/payment/createMerchantOrder";		// produce
+    public String paymentUrl = "http://payment.t.mukewang.com/foodie-payment/payment/createMerchantOrder";		// produce
 
     // 微信支付成功 -> 支付中心 -> 天天吃货平台
     //                       |-> 回调通知的url
 //    String payReturnUrl = "http://api.z.mukewang.com/foodie-dev-api/orders/notifyMerchantOrderPaid";
-    String payReturnUrl = "http://api.architect.study.jhmarryme.top/foodie-dev-api/orders/notifyMerchantOrderPaid";
+    public String payReturnUrl = "http://api.architect.study.jhmarryme.top/foodie-dev-api/orders/notifyMerchantOrderPaid";
 //    String payReturnUrl = "http://rarf8c.natappfree.cc/orders/notifyMerchantOrderPaid";
 
     // 用户上传头像的位置
