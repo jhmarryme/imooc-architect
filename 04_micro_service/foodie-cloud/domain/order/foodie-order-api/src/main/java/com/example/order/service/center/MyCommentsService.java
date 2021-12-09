@@ -2,12 +2,14 @@ package com.example.order.service.center;
 
 import com.example.order.pojo.OrderItems;
 import com.example.order.pojo.bo.center.OrderItemsCommentBO;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
+@FeignClient("foodie-order-service")
 @RequestMapping("order-comments-api")
 public interface MyCommentsService {
 

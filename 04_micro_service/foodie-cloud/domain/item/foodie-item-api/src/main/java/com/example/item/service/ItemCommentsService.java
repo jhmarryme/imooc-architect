@@ -1,6 +1,7 @@
 package com.example.item.service;
 
 import com.example.pojo.PagedGridResult;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Map;
  * @author JiaHao Wang
  * @date 2021/11/29 下午12:34
  */
+@FeignClient(name = "foodie-item-service", contextId = "item-comments-api", path = "/foodie-dev-api")
 @RequestMapping("item-comments-api")
 public interface ItemCommentsService {
 

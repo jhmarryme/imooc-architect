@@ -1,7 +1,7 @@
 package com.example.order.service.impl.center;
 
 import com.example.enums.YesOrNo;
-import com.example.item.pojo.vo.MyCommentVO;
+import com.example.item.service.ItemCommentsService;
 import com.example.order.mapper.OrderItemsMapper;
 import com.example.order.mapper.OrderStatusMapper;
 import com.example.order.mapper.OrdersMapper;
@@ -10,13 +10,9 @@ import com.example.order.pojo.OrderStatus;
 import com.example.order.pojo.Orders;
 import com.example.order.pojo.bo.center.OrderItemsCommentBO;
 import com.example.order.service.center.MyCommentsService;
-import com.example.pojo.PagedGridResult;
 import com.example.service.BaseService;
-import com.github.pagehelper.PageHelper;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,10 +39,13 @@ public class MyCommentsServiceImpl extends BaseService implements MyCommentsServ
     // public ItemsCommentsMapperCustom itemsCommentsMapperCustom;
 
     // TODO feign章节里改成item-api
-    @Autowired
-    private LoadBalancerClient client;
+    // @Autowired
+    // private LoadBalancerClient client;
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private ItemCommentsService itemCommentsService;
 
     @Autowired
     private Sid sid;
@@ -71,13 +70,14 @@ public class MyCommentsServiceImpl extends BaseService implements MyCommentsServ
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("commentList", commentList);
+        itemCommentsService.saveComments(map);
         // itemsCommentsMapperCustom.saveComments(map);
-        ServiceInstance instance = client.choose("FOODIE-ITEM-SERVICE");
-        String url = String.format("http://%s:%s/item-comments-api/saveComments",
-                instance.getHost(),
-                instance.getPort());
+        // ServiceInstance instance = client.choose("FOODIE-ITEM-SERVICE");
+        // String url = String.format("http://%s:%s/item-comments-api/saveComments",
+        //         instance.getHost(),
+        //         instance.getPort());
         // TODO 偷个懒，不判断返回status，等下个章节用Feign重写
-        restTemplate.postForLocation(url, map);
+        // restTemplate.postForLocation(url, map);
 
         // 2. 修改订单表改已评价 orders
         Orders order = new Orders();

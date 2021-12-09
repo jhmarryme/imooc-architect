@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:                                           # 数据源的相关配置
-    url: jdbc:mysql://1.14.140.53:30010/monolithic-foodie-shop?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    url: jdbc:mysql://1.14.140.53:30010/imooc_architect_04_microservice?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     username: root
     password: jh541224
 

@@ -2,6 +2,7 @@ package com.example.order.controller.center;
 
 import com.example.controller.BaseController;
 import com.example.enums.YesOrNo;
+import com.example.item.service.ItemCommentsService;
 import com.example.order.pojo.OrderItems;
 import com.example.order.pojo.Orders;
 import com.example.order.pojo.bo.center.OrderItemsCommentBO;
@@ -33,8 +34,11 @@ public class MyCommentsController extends BaseController {
     @Autowired
     private MyOrdersService myOrdersService;
 
+    // @Autowired
+    // private LoadBalancerClient client;
+
     @Autowired
-    private LoadBalancerClient client;
+    private ItemCommentsService itemCommentsService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -111,23 +115,23 @@ public class MyCommentsController extends BaseController {
 
 
         // TODO 前方施工，学完Feign再来改造
-        ServiceInstance instance = client.choose("FOODIE-ITEM-SERVICE");
-        String target = String.format("http://%s:%s/item-comments-api/myComments" +
-                        "?userId=%s&page=%s&pageSize=%s",
-                instance.getHost(),
-                instance.getPort(),
-                userId,
-                page,
-                pageSize);
-        // 偷个懒，不判断返回status，等下个章节用Feign重写
-        PagedGridResult grid = restTemplate.getForObject(target, PagedGridResult.class);
-        return CommonResult.ok(grid);
-
-        // PagedGridResult grid = myCommentsService.queryMyComments(userId,
+        // ServiceInstance instance = client.choose("FOODIE-ITEM-SERVICE");
+        // String target = String.format("http://%s:%s/item-comments-api/myComments" +
+        //                 "?userId=%s&page=%s&pageSize=%s",
+        //         instance.getHost(),
+        //         instance.getPort(),
+        //         userId,
         //         page,
         //         pageSize);
-        //
+        // // 偷个懒，不判断返回status，等下个章节用Feign重写
+        // PagedGridResult grid = restTemplate.getForObject(target, PagedGridResult.class);
         // return CommonResult.ok(grid);
+
+        PagedGridResult grid = itemCommentsService.queryMyComments(userId,
+                page,
+                pageSize);
+
+        return CommonResult.ok(grid);
     }
 
 }

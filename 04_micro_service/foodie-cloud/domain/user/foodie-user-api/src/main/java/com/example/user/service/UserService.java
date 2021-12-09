@@ -2,8 +2,10 @@ package com.example.user.service;
 
 import com.example.user.pojo.Users;
 import com.example.user.pojo.bo.UserBO;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+@FeignClient(name = "foodie-user-service", contextId = "user-api")
 @RequestMapping("user-api")
 public interface UserService {
 

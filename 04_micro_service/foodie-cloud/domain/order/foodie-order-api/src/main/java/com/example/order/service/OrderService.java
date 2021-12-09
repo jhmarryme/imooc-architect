@@ -3,8 +3,10 @@ package com.example.order.service;
 import com.example.order.pojo.OrderStatus;
 import com.example.order.pojo.bo.PlaceOrderBO;
 import com.example.order.pojo.vo.OrderVO;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+@FeignClient("foodie-order-service")
 @RequestMapping("order-api")
 public interface OrderService {
 
