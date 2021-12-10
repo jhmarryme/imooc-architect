@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
-@FeignClient("foodie-order-service")
+@FeignClient(name = "foodie-order-service", contextId = "order-comments-api", path = "foodie-order-service")
 @RequestMapping("order-comments-api")
 public interface MyCommentsService {
 
@@ -30,14 +30,4 @@ public interface MyCommentsService {
     @PostMapping("saveOrderComments")
     void saveComments(String orderId, String userId, List<OrderItemsCommentBO> commentList);
 
-
-    // TODO 移到了itemCommentsService里
-    // /**
-    //  * 我的评价查询 分页
-    //  * @param userId
-    //  * @param page
-    //  * @param pageSize
-    //  * @return
-    //  */
-    // public PagedGridResult queryMyComments(String userId, Integer page, Integer pageSize);
 }

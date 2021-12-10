@@ -8,7 +8,7 @@ import com.example.pojo.PagedGridResult;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient("foodie-order-service")
+@FeignClient(name = "foodie-order-service", contextId = "myorder-api", path = "foodie-order-service")
 @RequestMapping("myorder-api")
 public interface MyOrdersService {
 
@@ -84,5 +84,4 @@ public interface MyOrdersService {
     @GetMapping("checkUserOrder")
     public CommonResult checkUserOrder(@RequestParam("userId") String userId,
                                        @RequestParam("orderId") String orderId);
-
 }

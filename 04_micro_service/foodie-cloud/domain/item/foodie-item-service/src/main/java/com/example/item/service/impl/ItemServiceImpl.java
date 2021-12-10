@@ -16,15 +16,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@Service
+@RestController
 @Slf4j
 public class ItemServiceImpl implements ItemService {
 
@@ -133,6 +133,7 @@ public class ItemServiceImpl implements ItemService {
 
         return setterPagedGrid(list, page);
     }
+
     private PagedGridResult setterPagedGrid(List<?> list, Integer page) {
         PageInfo<?> pageList = new PageInfo<>(list);
         PagedGridResult grid = new PagedGridResult();
@@ -185,7 +186,7 @@ public class ItemServiceImpl implements ItemService {
 
         // 2. 判断库存，是否能够减少到0以下
 //        if (stock - buyCounts < 0) {
-            // 提示用户库存不够
+        // 提示用户库存不够
 //            10 - 3 -3 - 5 = -1
 //        }
 

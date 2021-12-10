@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "foodie-user-service", contextId = "address-api")
+@FeignClient(name = "foodie-user-service", contextId = "address-api", path = "foodie-user-service")
 @RequestMapping("address-api")
 public interface AddressService {
 

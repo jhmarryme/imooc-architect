@@ -25,13 +25,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Service
+@RestController
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -43,17 +44,11 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderStatusMapper orderStatusMapper;
 
-    // TODO 学了Feign在来把注释打开
     @Autowired
     private AddressService addressService;
 
     @Autowired
     private ItemService itemService;
-    // @Autowired
-    // private LoadBalancerClient client;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Autowired
     private Sid sid;
@@ -75,16 +70,7 @@ public class OrderServiceImpl implements OrderService {
 
         String orderId = sid.nextShort();
 
-        // FIXME 等待feign章节再来简化
         UserAddress address = addressService.queryUserAddres(userId, addressId);
-        // ServiceInstance instance = client.choose("FOODIE-USER-SERVICE");
-        // String url = String.format("http://%s:%s/address-api/queryAddress" +
-        //                 "?userId=%s&addressId=%s",
-        //         instance.getHost(),
-        //         instance.getPort(),
-        //         userId, addressId);
-        // // TODO 偷个懒，不判断返回status，等下个章节用Feign重写
-        // UserAddress address = restTemplate.getForObject(url, UserAddress.class);
 
         // 1. 新订单数据保存
         Orders newOrder = new Orders();
@@ -124,13 +110,6 @@ public class OrderServiceImpl implements OrderService {
 
             // 2.1 根据规格id，查询规格的具体信息，主要获取价格
             ItemsSpec itemSpec = itemService.queryItemSpecById(itemSpecId);
-            // ServiceInstance itemApi = client.choose("FOODIE-ITEM-SERVICE");
-            // url = String.format("http://%s:%s/item-api/singleItemSpec?specId=%s",
-            //         itemApi.getHost(),
-            //         itemApi.getPort(),
-            //         itemSpecId);
-            // ItemsSpec itemSpec = restTemplate.getForObject(url, ItemsSpec.class);
-
 
             totalAmount += itemSpec.getPriceNormal() * buyCounts;
             realPayAmount += itemSpec.getPriceDiscount() * buyCounts;

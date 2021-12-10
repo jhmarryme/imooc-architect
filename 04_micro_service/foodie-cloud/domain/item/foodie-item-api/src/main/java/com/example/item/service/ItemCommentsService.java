@@ -11,7 +11,7 @@ import java.util.Map;
  * @author JiaHao Wang
  * @date 2021/11/29 下午12:34
  */
-@FeignClient(name = "foodie-item-service", contextId = "item-comments-api", path = "/foodie-dev-api")
+@FeignClient(name = "foodie-item-service", contextId = "item-comments-api", path = "/foodie-item-service")
 @RequestMapping("item-comments-api")
 public interface ItemCommentsService {
 
@@ -27,6 +27,6 @@ public interface ItemCommentsService {
                                            @RequestParam(value = "page", required = false) Integer page,
                                            @RequestParam(value = "pageSize", required = false)Integer pageSize);
 
-    @PostMapping("saveComments")
+    @PostMapping("/saveComments")
     public void saveComments(@RequestBody Map<String, Object> map);
 }

@@ -17,10 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by 半仙.
- */
-// @RestController
+@RestController
 public class ItemCommentsServiceImpl extends BaseService implements ItemCommentsService {
 
     @Autowired

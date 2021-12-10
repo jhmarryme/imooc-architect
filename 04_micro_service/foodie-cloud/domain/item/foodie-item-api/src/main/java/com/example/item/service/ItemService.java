@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "foodie-item-service", contextId = "item-api", path = "/foodie-dev-api")
+@FeignClient(name = "foodie-item-service", contextId = "item-api", path = "/foodie-item-service")
 @RequestMapping("item-api")
 public interface ItemService {
 

@@ -5,7 +5,7 @@ import com.example.user.pojo.bo.center.CenterUserBO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "foodie-user-service", contextId = "center-user-api")
+@FeignClient(name = "foodie-user-service", contextId = "center-user-api", path = "foodie-user-service")
 @RequestMapping("center-user-api")
 public interface CenterUserService {
 

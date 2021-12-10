@@ -6,7 +6,7 @@ import com.example.order.pojo.vo.OrderVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient("foodie-order-service")
+@FeignClient(name = "foodie-order-service", contextId = "order-api", path = "foodie-order-service")
 @RequestMapping("order-api")
 public interface OrderService {
 
