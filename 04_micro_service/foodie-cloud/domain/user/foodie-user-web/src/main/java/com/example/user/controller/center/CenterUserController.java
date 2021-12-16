@@ -1,4 +1,4 @@
-package com.imooc.user.controller.center;
+package com.example.user.controller.center;
 
 import com.example.controller.BaseController;
 import com.example.pojo.CommonResult;
@@ -8,7 +8,7 @@ import com.example.user.service.center.CenterUserService;
 import com.example.utils.CookieUtils;
 import com.example.utils.DateUtil;
 import com.example.utils.JsonUtils;
-import com.imooc.user.resource.FileUpload;
+import com.example.user.resource.FileUpload;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -68,7 +68,7 @@ public class CenterUserController extends BaseController {
 
                 if (StringUtils.isNotBlank(fileName)) {
 
-                    // 文件重命名  imooc-face.png -> ["imooc-face", "png"]
+                    // 文件重命名  example-face.png -> ["example-face", "png"]
                     String fileNameArr[] = fileName.split("\\.");
 
                     // 获取文件的后缀名

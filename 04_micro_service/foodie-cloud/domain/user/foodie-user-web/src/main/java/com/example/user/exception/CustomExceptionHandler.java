@@ -1,4 +1,4 @@
-package com.imooc.user.exception;
+package com.example.user.exception;
 
 import com.example.pojo.CommonResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;

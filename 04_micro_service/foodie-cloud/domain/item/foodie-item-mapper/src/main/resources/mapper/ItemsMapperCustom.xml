@@ -23,7 +23,7 @@
         </if>
     </select>
     <!--
-        <select id="searchItems" parameterType="Map" resultType="com.imooc.item.pojo.vo.SearchItemsVO">
+        <select id="searchItems" parameterType="Map" resultType="com.examplele.item.pojo.vo.SearchItemsVO">
             SELECT
                 i.id as itemId,
                 i.item_name as itemName,
@@ -63,7 +63,7 @@
         &lt;!&ndash; p: 根据价格排序&ndash;&gt;
 
 
-        <select id="searchItemsByThirdCat" parameterType="Map" resultType="com.imooc.item.pojo.vo.SearchItemsVO">
+        <select id="searchItemsByThirdCat" parameterType="Map" resultType="com.examplele.item.pojo.vo.SearchItemsVO">
             SELECT
                 i.id as itemId,
                 i.item_name as itemName,

@@ -1,4 +1,4 @@
-package com.imooc.user;
+package com.example.user;
 
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

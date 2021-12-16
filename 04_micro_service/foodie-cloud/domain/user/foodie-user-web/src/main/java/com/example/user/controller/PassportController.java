@@ -1,4 +1,4 @@
-package com.imooc.user.controller;
+package com.example.user.controller;
 
 import com.example.controller.BaseController;
 import com.example.pojo.CommonResult;

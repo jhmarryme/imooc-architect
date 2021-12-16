@@ -130,8 +130,8 @@ public class OrdersController extends BaseController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("imoocUserId", "imooc");
-        headers.add("password", "imooc");
+        headers.add("imoocUserId", "example");
+        headers.add("password", "example");
 
         HttpEntity<MerchantOrdersVO> entity =
                 new HttpEntity<>(merchantOrdersVO, headers);
