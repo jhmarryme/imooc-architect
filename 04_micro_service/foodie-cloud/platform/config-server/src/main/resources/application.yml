@@ -1,0 +1,40 @@
+server:
+  port: 20003
+############################################################
+#
+# config中心配置
+#
+############################################################
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        # 属性重载，将远程的配置文件中的同名属性使用这里的覆盖掉
+        overrides:
+          test: mytest
+        git:
+          uri: git@github.com:jhmarryme/config-repo.git # 注意SSH链接地址
+          ignore-local-ssh-settings: true # 重要！忽略本地ssh配置，使用下面密钥。方便移植（如：容器部署）
+          # 现在的github默认分支为main
+          default-label: main
+          force-pull: true # 强制拉取资源文件
+          # 不放在所有根目录，给每个应用都创建一个目录来存放
+          # 占位符支持 3 个变量 {application} {profile} {label}
+          search-paths: "architect/foodie/{application}"
+          private-key: |
+
+############################################################
+#
+# actuator配置
+#
+############################################################
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

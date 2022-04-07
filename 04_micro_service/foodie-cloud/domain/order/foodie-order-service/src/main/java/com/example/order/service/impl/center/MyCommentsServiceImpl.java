@@ -1,7 +1,6 @@
 package com.example.order.service.impl.center;
 
 import com.example.enums.YesOrNo;
-import com.example.item.service.ItemCommentsService;
 import com.example.order.mapper.OrderItemsMapper;
 import com.example.order.mapper.OrderStatusMapper;
 import com.example.order.mapper.OrdersMapper;
@@ -10,13 +9,13 @@ import com.example.order.pojo.OrderStatus;
 import com.example.order.pojo.Orders;
 import com.example.order.pojo.bo.center.OrderItemsCommentBO;
 import com.example.order.service.center.MyCommentsService;
+import com.example.order.service.feign.ItemCommentsFeignClient;
 import com.example.service.BaseService;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -36,7 +35,7 @@ public class MyCommentsServiceImpl extends BaseService implements MyCommentsServ
     public OrderStatusMapper orderStatusMapper;
 
     @Autowired
-    private ItemCommentsService itemCommentsService;
+    private ItemCommentsFeignClient itemCommentsService;
 
     @Autowired
     private Sid sid;

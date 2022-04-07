@@ -5,13 +5,17 @@ import com.example.pojo.CommonResult;
 import com.example.pojo.ShopcartBO;
 import com.example.user.pojo.Users;
 import com.example.user.pojo.bo.UserBO;
+import com.example.user.resource.UserApplicationProperties;
 import com.example.user.service.UserService;
 import com.example.utils.CookieUtils;
 import com.example.utils.JsonUtils;
 import com.example.utils.MD5Utils;
 import com.example.utils.RedisOperator;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +28,7 @@ import java.util.List;
 @Api(value = "注册登录", tags = {"用于注册登录的相关接口"})
 @RestController
 @RequestMapping("passport")
+@Slf4j
 public class PassportController extends BaseController {
 
     @Autowired
@@ -32,8 +37,54 @@ public class PassportController extends BaseController {
     @Autowired
     private RedisOperator redisOperator;
 
+    @Autowired
+    private UserApplicationProperties userApplicationProperties;
+
     @ApiOperation(value = "用户名是否存在", notes = "用户名是否存在", httpMethod = "GET")
     @GetMapping("/usernameIsExist")
+    @HystrixCommand(
+            // 全局唯一的标识服务，默认是方法签名
+            commandKey = "loginFail",
+            // 全局服务分组，用于组织仪表盘，统计信息分组
+            // 如果不指定的话，会默认指定一个值，以类名作为默认值
+            groupKey = "password",
+            // 指向当前类的 loginFail 方法，签名需要是 public 或则 private
+            fallbackMethod = "loginFail",
+            // 在列表中声明的异常类型不会触发降级
+            ignoreExceptions = {IllegalArgumentException.class},
+            // 线程有关属性配置
+            // 线程组：多个服务可以共用一个线程组
+            threadPoolKey = "threadPoolA",
+            threadPoolProperties = {
+                    // 有很多属性可配置，配置线程池属性，具体有哪些可以参考 Hystrix 的官方文档
+                    // 这里挑几个有代表性的
+                    // 核心线程数量
+                    @HystrixProperty(name = "coreSize", value = "1"),
+                    /*
+                      队列最大值
+                      size > 0: 使用 LinkedBlockingQueue 来实现请求等待队列
+                      默认 -1：SynchronousQueue 阻塞队列，不存储元素；简单说就是一个生产者消费者的例子，但是只有一个位置，给一个，就必须有一个消费完成后，才会有下一个位置
+                        对于这种 JUC 的功能，最好还是自己去 debug 源码
+                     */
+                    @HystrixProperty(name = "maxQueueSize", value = "2"),
+                    /*
+                      队列大小拒绝阈值：在队列没有达到 maxQueueSize 值时，但是达到了这里的阀值则拒绝
+                      在 maxQueueSize = -1 时无效
+                     */
+                    @HystrixProperty(name = "queueSizeRejectionThreshold", value = "2"),
+                    // 统计相关属性
+                    // （线程池）统计窗口持续时间
+                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "1024"),
+                    // （线程池）窗口内桶的数量
+                    // 这两个加起来的含义就是：在持续时间内，均分多少个桶
+                    // 大概好像是：比如 10 分钟，10 个桶，那么随着时间的推移，到了 11 分钟，那么第 1 个桶就被丢弃，然后成为了第 10 个桶
+                    // 在这 1 分钟内的数据都被存储在这个桶里面；总共就 10 个桶来回倒腾
+                    @HystrixProperty(name = "metrics.rollingStats.numBuckets", value = "2")
+            },
+            commandProperties = {
+                    // 熔断降级相关属性也可以放到这里
+            }
+    )
     public CommonResult usernameIsExist(@RequestParam String username) {
 
         // 1. 判断用户名不能为空
@@ -56,6 +107,10 @@ public class PassportController extends BaseController {
     public CommonResult regist(@RequestBody UserBO userBO,
                                HttpServletRequest request,
                                HttpServletResponse response) {
+        if (userApplicationProperties.isDisabledRegistration()) {
+            log.info("{} 该用户被系统拦截注册", userBO.getUsername());
+            return CommonResult.errorMsg("当前注册用户过多，请稍后再试");
+        }
 
         String username = userBO.getUsername();
         String password = userBO.getPassword();
@@ -88,7 +143,7 @@ public class PassportController extends BaseController {
         Users userResult = userService.createUser(userBO);
 
         // 生成用户token，存入redis会话
-       userResult = setNullProperty(userResult);
+        userResult = setNullProperty(userResult);
         // UsersVO usersVO = conventUsersVO(userResult);
         CookieUtils.setCookie(request, response, "user",
                 JsonUtils.objectToJson(userResult), true);
@@ -123,7 +178,7 @@ public class PassportController extends BaseController {
             return CommonResult.errorMsg("用户名或密码不正确");
         }
         // 生成用户token，存入redis会话
-       userResult = setNullProperty(userResult);
+        userResult = setNullProperty(userResult);
         // UsersVO usersVO = conventUsersVO(userResult);
 
         CookieUtils.setCookie(request, response, "user",
@@ -244,4 +299,17 @@ public class PassportController extends BaseController {
         return CommonResult.ok();
     }
 
+    /**
+     * 降级方法，原始方法有什么参数就必须有什么参数，但是可以多一个 Throwable 参数
+     *      当异常降级的时候，就会把那个异常注入给你
+     * @author Jiahao Wang
+     * @date 2022/3/31 下午1:38
+     * @param username username
+     * @param throwable throwable
+     * @return com.example.pojo.CommonResult
+     */
+    private CommonResult loginFail(@RequestParam String username,
+                                   Throwable throwable) throws Exception {
+        return CommonResult.errorMsg("验证码输错了（模仿 12306）");
+    }
 }

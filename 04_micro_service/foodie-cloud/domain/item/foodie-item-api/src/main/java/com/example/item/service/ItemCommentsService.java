@@ -12,7 +12,6 @@ import java.util.Map;
  * @date 2021/11/29 下午12:34
  */
 @FeignClient(name = "foodie-item-service", contextId = "item-comments-api", path = "/foodie-item-service")
-@RequestMapping("item-comments-api")
 public interface ItemCommentsService {
 
     /**
@@ -22,11 +21,11 @@ public interface ItemCommentsService {
      * @param pageSize
      * @return
      */
-    @GetMapping("myComments")
+    @GetMapping("item-comments-api/myComments")
     public PagedGridResult queryMyComments(@RequestParam("userId") String userId,
                                            @RequestParam(value = "page", required = false) Integer page,
                                            @RequestParam(value = "pageSize", required = false)Integer pageSize);
 
-    @PostMapping("/saveComments")
+    @PostMapping("item-comments-api/saveComments")
     public void saveComments(@RequestBody Map<String, Object> map);
 }

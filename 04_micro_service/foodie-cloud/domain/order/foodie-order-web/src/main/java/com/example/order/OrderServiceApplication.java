@@ -1,5 +1,6 @@
 package com.example.order;
 
+import com.example.order.service.feign.ItemCommentsFeignClient;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -19,9 +20,10 @@ import tk.mybatis.spring.annotation.MapperScan;
 @EnableEurekaClient
 @EnableFeignClients(
         basePackages = {
-           "com.example.user.service",
-           "com.example.item.service"
-       }
+                "com.example.user.service",
+                "com.example.item.service",
+                "com.example.order.service.feign"
+        }
 )
 public class OrderServiceApplication {
 

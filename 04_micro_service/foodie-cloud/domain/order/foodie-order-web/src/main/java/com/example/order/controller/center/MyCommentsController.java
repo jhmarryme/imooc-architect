@@ -2,12 +2,12 @@ package com.example.order.controller.center;
 
 import com.example.controller.BaseController;
 import com.example.enums.YesOrNo;
-import com.example.item.service.ItemCommentsService;
 import com.example.order.pojo.OrderItems;
 import com.example.order.pojo.Orders;
 import com.example.order.pojo.bo.center.OrderItemsCommentBO;
 import com.example.order.service.center.MyCommentsService;
 import com.example.order.service.center.MyOrdersService;
+import com.example.order.service.feign.ItemCommentsFeignClient;
 import com.example.pojo.CommonResult;
 import com.example.pojo.PagedGridResult;
 import io.swagger.annotations.Api;
@@ -15,8 +15,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -37,8 +35,11 @@ public class MyCommentsController extends BaseController {
     // @Autowired
     // private LoadBalancerClient client;
 
+    // @Autowired
+    // private ItemCommentsService itemCommentsService;
+
     @Autowired
-    private ItemCommentsService itemCommentsService;
+    private ItemCommentsFeignClient itemCommentsService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -57,7 +58,7 @@ public class MyCommentsController extends BaseController {
             return checkResult;
         }
         // 判断该笔订单是否已经评价过，评价过了就不再继续
-        Orders myOrder = (Orders)checkResult.getData();
+        Orders myOrder = (Orders) checkResult.getData();
         if (myOrder.getIsComment() == YesOrNo.YES.type) {
             return CommonResult.errorMsg("该笔订单已经评价");
         }
