@@ -1,0 +1,48 @@
+server:
+  port: 20004
+
+############################################################
+#
+# actuator配置
+#
+############################################################
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+spring:
+  application:
+    name: gateway-platform
+  cloud:
+    # gateway 配置
+    gateway:
+      discovery:
+        # 定位器: 自动创建路由规则
+        locator:
+          # 会去拉取所有注册的服务，并且自动添加路由规则
+          # 生产环境关闭这个：不自动生成默认的路由规则
+          enabled: false
+          # 将 eureka 上获取的服务名转成小写
+          lower-case-service-id: true
+      # RouteDefinition 中的属性
+      # 路由规则 在代码中配置
+      # routes:
+  redis:
+    database: 0
+    host: 1.14.140.53
+    port: 30020
+    password: ENC(jgUOAW3WOFOnOGbPEew+xtrPvZtTv/BD)
+
+# jasypt 密码加密配置
+jasypt:
+  encryptor:
+    # 加密盐值
+    password: jhmarryme.com
+    # 加密算法设置 3.0.0 以后
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
