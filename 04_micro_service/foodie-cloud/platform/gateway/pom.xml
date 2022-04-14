@@ -42,6 +42,27 @@
             <artifactId>jasypt-spring-boot-starter</artifactId>
             <version>3.0.4</version>
         </dependency>
+        <!-- 引入 foodie-auth-api 与 feign -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>foodie-auth-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <!-- 注意：
+                 由于 Gateway 是基于 webflux，所以要排除掉 web，
+                 webflux 的 web 支持是 spring-boot-starter-webflux
+                 -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
+        </dependency>
     </dependencies>
 
     <build>

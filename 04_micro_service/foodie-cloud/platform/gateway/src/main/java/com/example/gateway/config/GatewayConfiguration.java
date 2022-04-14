@@ -1,5 +1,6 @@
-package com.example.gateway;
+package com.example.gateway.config;
 
+import com.example.gateway.filter.AuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
@@ -22,10 +23,13 @@ public class GatewayConfiguration {
 
     @Autowired
     @Qualifier("redisRateLimiterUser")
-    public RedisRateLimiter redisRateLimiterUser;
+    private RedisRateLimiter redisRateLimiterUser;
+    //
+    // @Autowired
+    // private AuthFilter authFilter;
 
     @Bean
-    public RouteLocator routeLocator(RouteLocatorBuilder builder) {
+    public RouteLocator routeLocator(RouteLocatorBuilder builder, AuthFilter authFilter) {
         return builder.routes()
                 .route(
                         "foodie-user-service",
@@ -44,7 +48,8 @@ public class GatewayConfiguration {
                 ).route(
                         "foodie-order-service",
                         r -> r.path("/orders/**", "/mycomments/**", "/myorders/**")
-                                .filters(f -> f.prefixPath("/foodie-order-service"))
+                                .filters(f -> f.filter(authFilter)
+                                        .prefixPath("/foodie-order-service"))
                                 .uri("lb://foodie-order-service")
                 ).route(
                         "foodie-cart-service",
@@ -56,6 +61,10 @@ public class GatewayConfiguration {
                         r -> r.path("/items/**")
                                 .filters(f -> f.prefixPath("/foodie-item-service"))
                                 .uri("lb://foodie-item-service")
+                ).route(
+                        "foodie-auth-service",
+                        r -> r.path("/foodie-auth-service/refreash/**")
+                                .uri("lb://foodie-auth-service")
                 )
                 .build();
     }

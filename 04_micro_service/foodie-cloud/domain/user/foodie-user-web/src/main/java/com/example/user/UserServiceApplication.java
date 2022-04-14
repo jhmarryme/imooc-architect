@@ -1,10 +1,12 @@
 package com.example.user;
 
+import com.example.auth.service.AuthService;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import tk.mybatis.spring.annotation.MapperScan;
 
@@ -19,8 +21,10 @@ import tk.mybatis.spring.annotation.MapperScan;
 // 扫描所有包以及相关组件包
 @ComponentScan(basePackages = {"com.example", "org.n3r.idworker"})
 @EnableDiscoveryClient
-// TODO feign注解
 @EnableCircuitBreaker
+@EnableFeignClients(basePackageClasses = {
+        AuthService.class
+})
 public class UserServiceApplication {
 
     public static void main(String[] args) {

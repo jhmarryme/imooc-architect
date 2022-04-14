@@ -1,10 +1,15 @@
 package com.example.user.controller;
 
+import com.example.auth.service.AuthService;
+import com.example.auth.service.entity.Account;
+import com.example.auth.service.entity.AuthResponse;
+import com.example.auth.service.entity.AuthResponseCode;
 import com.example.controller.BaseController;
 import com.example.pojo.CommonResult;
 import com.example.pojo.ShopcartBO;
 import com.example.user.pojo.Users;
 import com.example.user.pojo.bo.UserBO;
+import com.example.user.pojo.vo.UserVO;
 import com.example.user.resource.UserApplicationProperties;
 import com.example.user.service.UserService;
 import com.example.utils.CookieUtils;
@@ -17,12 +22,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @Api(value = "注册登录", tags = {"用于注册登录的相关接口"})
@@ -30,6 +37,15 @@ import java.util.List;
 @RequestMapping("passport")
 @Slf4j
 public class PassportController extends BaseController {
+
+    /** token 使用的头 */
+    private static final String AUTH = "Authorization";
+
+    /** 存放refresh token的头 */
+    private static final String REFRESH_TOKEN_HEADER = "refresh-token";
+
+    /** 存放用户的头 */
+    private static final String USERNAME = "imooc-user-name";
 
     @Autowired
     private UserService userService;
@@ -39,6 +55,9 @@ public class PassportController extends BaseController {
 
     @Autowired
     private UserApplicationProperties userApplicationProperties;
+
+    @Autowired
+    private AuthService authService;
 
     @ApiOperation(value = "用户名是否存在", notes = "用户名是否存在", httpMethod = "GET")
     @GetMapping("/usernameIsExist")
@@ -140,17 +159,25 @@ public class PassportController extends BaseController {
         }
 
         // 4. 实现注册
-        Users userResult = userService.createUser(userBO);
+        Users user = userService.createUser(userBO);
 
-        // 生成用户token，存入redis会话
-        userResult = setNullProperty(userResult);
-        // UsersVO usersVO = conventUsersVO(userResult);
+        // 生成用户token
+        AuthResponse token = authService.tokenize(user.getId());
+        if (!token.getCode().equals(AuthResponseCode.SUCCESS)) {
+            log.error("token error uid ={}", user.getId());
+            return CommonResult.errorMsg("token error");
+        }
+        // 将 token 信息添加到 响应的 header 中
+        addAuth2Header(response, token.getAccount());
+
+        // user = setNullProperty(user);
+        UserVO userVO = conventUsersVO(user);
         CookieUtils.setCookie(request, response, "user",
-                JsonUtils.objectToJson(userResult), true);
+                JsonUtils.objectToJson(userVO), true);
 
 
         // 同步购物车数据
-        synchShopcartData(userResult.getId(), request, response);
+        synchShopcartData(user.getId(), request, response);
 
         return CommonResult.ok();
     }
@@ -171,24 +198,76 @@ public class PassportController extends BaseController {
         }
 
         // 1. 实现登录
-        Users userResult = userService.queryUserForLogin(username,
+        Users user = userService.queryUserForLogin(username,
                 MD5Utils.getMD5Str(password));
 
-        if (userResult == null) {
+        if (user == null) {
             return CommonResult.errorMsg("用户名或密码不正确");
         }
-        // 生成用户token，存入redis会话
-        userResult = setNullProperty(userResult);
-        // UsersVO usersVO = conventUsersVO(userResult);
 
+        // 生成用户token
+        AuthResponse token = authService.tokenize(user.getId());
+        if (!token.getCode().equals(AuthResponseCode.SUCCESS)) {
+            log.error("token error uid ={}", user.getId());
+            return CommonResult.errorMsg("token error");
+        }
+        // 将 token 信息添加到 响应的 header 中
+        addAuth2Header(response, token.getAccount());
+
+        // user = setNullProperty(user);
+        UserVO userVO = conventUsersVO(user);
         CookieUtils.setCookie(request, response, "user",
-                JsonUtils.objectToJson(userResult), true);
+                JsonUtils.objectToJson(userVO), true);
 
         // TODO 生成用户token，存入redis会话
         // 同步购物车数据
-        synchShopcartData(userResult.getId(), request, response);
+        synchShopcartData(user.getId(), request, response);
 
-        return CommonResult.ok(userResult);
+        return CommonResult.ok(user);
+    }
+
+    @ApiOperation(value = "用户退出登录", notes = "用户退出登录", httpMethod = "POST")
+    @PostMapping("/logout")
+    public CommonResult logout(@RequestParam String userId,
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
+
+        Account account = Account.builder()
+                // 直接从请求头中获取这些信息，因为前面要求需要填写这些信息
+                .token(request.getHeader(AUTH))
+                .userId(userId)
+                .refreshToken(request.getHeader(REFRESH_TOKEN_HEADER))
+                .build();
+
+        AuthResponse resp = authService.delete(account);
+        if (!resp.getCode().equals(AuthResponseCode.SUCCESS)) {
+            return CommonResult.errorMsg("token error");
+        }
+
+        // 清除用户的相关信息的cookie
+        CookieUtils.deleteCookie(request, response, "user");
+
+        // 用户退出登录，清除redis中user的会话信息
+        redisOperator.del(REDIS_USER_TOKEN + ":" + userId);
+
+        // 分布式会话中需要清除用户数据
+        CookieUtils.deleteCookie(request, response, FOODIE_SHOPCART);
+
+        return CommonResult.ok();
+    }
+
+    /**
+     * 降级方法，原始方法有什么参数就必须有什么参数，但是可以多一个 Throwable 参数
+     *      当异常降级的时候，就会把那个异常注入给你
+     * @author Jiahao Wang
+     * @date 2022/3/31 下午1:38
+     * @param username username
+     * @param throwable throwable
+     * @return com.example.pojo.CommonResult
+     */
+    private CommonResult loginFail(@RequestParam String username,
+                                   Throwable throwable) throws Exception {
+        return CommonResult.errorMsg("验证码输错了（模仿 12306）");
     }
 
     /**
@@ -270,6 +349,36 @@ public class PassportController extends BaseController {
         }
     }
 
+    /**
+     * 将 token 信息添加到响应的 header 中，前端处理登录流程的地方，就要额外对照换个 header 进行处理，
+     * 并按规范添加到 请求头中，在通过网关鉴权的时候才会通过
+     *
+     * @param response
+     * @param token
+     */
+    private void addAuth2Header(HttpServletResponse response, Account token) {
+        response.addHeader(AUTH, token.getToken());
+        response.addHeader(REFRESH_TOKEN_HEADER, token.getRefreshToken());
+        response.addHeader(USERNAME, token.getUserId());
+
+        // 告诉前端 token 过期的时间，在过期前如果检测到用户当前还有操作的话，就刷新 token
+        // 不过这里还需要注意的是：这里设置为过期时间为 1 天
+        // 在 token 生成的时候， jwt 里面有一个 withExpiresAt 值，最好将这个也改成一样的
+        // 不然如果依赖 jwt 里面的过期时间的话，就有异议了
+        Calendar expTime = Calendar.getInstance();
+        expTime.add(Calendar.DAY_OF_MONTH, 1);
+        response.addHeader("token-exp-time", expTime.getTimeInMillis() + "");
+    }
+
+    /**
+     * convert
+     */
+    public UserVO conventUsersVO(Users user) {
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return userVO;
+    }
+
     private Users setNullProperty(Users userResult) {
         userResult.setPassword(null);
         userResult.setMobile(null);
@@ -278,38 +387,5 @@ public class PassportController extends BaseController {
         userResult.setUpdatedTime(null);
         userResult.setBirthday(null);
         return userResult;
-    }
-
-
-    @ApiOperation(value = "用户退出登录", notes = "用户退出登录", httpMethod = "POST")
-    @PostMapping("/logout")
-    public CommonResult logout(@RequestParam String userId,
-                               HttpServletRequest request,
-                               HttpServletResponse response) {
-
-        // 清除用户的相关信息的cookie
-        CookieUtils.deleteCookie(request, response, "user");
-
-        // 用户退出登录，清除redis中user的会话信息
-        redisOperator.del(REDIS_USER_TOKEN + ":" + userId);
-
-        // 分布式会话中需要清除用户数据
-        CookieUtils.deleteCookie(request, response, FOODIE_SHOPCART);
-
-        return CommonResult.ok();
-    }
-
-    /**
-     * 降级方法，原始方法有什么参数就必须有什么参数，但是可以多一个 Throwable 参数
-     *      当异常降级的时候，就会把那个异常注入给你
-     * @author Jiahao Wang
-     * @date 2022/3/31 下午1:38
-     * @param username username
-     * @param throwable throwable
-     * @return com.example.pojo.CommonResult
-     */
-    private CommonResult loginFail(@RequestParam String username,
-                                   Throwable throwable) throws Exception {
-        return CommonResult.errorMsg("验证码输错了（模仿 12306）");
     }
 }
